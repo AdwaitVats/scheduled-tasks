@@ -23,7 +23,7 @@ for (index,row) in data_frame.iterrows():
         with open(f"letter_templates/{letter}") as file:
             message=file.read()
             message=message.replace("[NAME]",row["name"])
-        connection=smtplib.SMTP("smtp.gmail.com")
+        connection=smtplib.SMTP("smtp.gmail.com",587)
         connection.starttls()
         connection.login(user=MY_EMAIL,password=MY_PASSWORD)
         connection.sendmail(from_addr=MY_EMAIL, to_addrs="adwaitvats1@gmail.com",
