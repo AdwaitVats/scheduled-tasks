@@ -6,33 +6,26 @@
 # See the solution video in the 100 Days of Python Course for explainations.
 
 
-from datetime import datetime
 import pandas
-import random
 import smtplib
 import os
-
-# import os and use it to get the Github repository secrets
 MY_EMAIL = os.environ.get("MY_EMAIL")
 MY_PASSWORD = os.environ.get("MY_PASSWORD")
-
-today = datetime.now()
-today_tuple = (today.month, today.day)
-
-data = pandas.read_csv("birthdays.csv")
-birthdays_dict = {(data_row["month"], data_row["day"])                  : data_row for (index, data_row) in data.iterrows()}
-if today_tuple in birthdays_dict:
-    birthday_person = birthdays_dict[today_tuple]
-    file_path = f"letter_templates/letter_{random.randint(1, 3)}.txt"
-    with open(file_path) as letter_file:
-        contents = letter_file.read()
-        contents = contents.replace("[NAME]", birthday_person["name"])
-
-    with smtplib.SMTP("YOUR EMAIL PROVIDER SMTP SERVER ADDRESS") as connection:
+import random
+data=pandas.read_csv("birthdays.csv")
+letter_list=["letter_1.txt","letter_2.txt","letter_3.txt"]
+data_frame=pandas.DataFrame(data)
+import datetime as dt
+now=dt.datetime.now()
+for (index,row) in data_frame.iterrows():
+    if row["day"]==now.day and row["month"]==now.month:
+        letter=random.choice(letter_list)
+        with open(f"letter_templates/{letter}") as file:
+            message=file.read()
+            message=message.replace("[NAME]",row["name"])
+        connection=smtplib.SMTP("smtp.gmail.com")
         connection.starttls()
-        connection.login(MY_EMAIL, MY_PASSWORD)
-        connection.sendmail(
-            from_addr=MY_EMAIL,
-            to_addrs=birthday_person["email"],
-            msg=f"Subject:Happy Birthday!\n\n{contents}"
-        )
+        connection.login(user=MY_EMAIL,password=MY_PASSWORD)
+        connection.sendmail(from_addr=MY_EMAIL, to_addrs="adwaitvats1@gmail.com",
+                            msg=f"Subject: Birthday Wisher\n\n{message}")
+        connection.close()
